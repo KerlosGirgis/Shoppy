@@ -21,11 +21,14 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isDialogVisible = false;
+  bool _isPasswordVisible = false;
+
   @override
   void initState() {
     super.initState();
     BlocProvider.of<AuthCubit>(context).clearErrors();
   }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -35,6 +38,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return BlocBuilder<ThemeCubit, AppTheme>(
       builder: (context, appTheme) {
         return BlocListener<AuthCubit, AuthState>(
@@ -44,7 +48,8 @@ class _LoginPageState extends State<LoginPage> {
               showDialog(
                 context: context,
                 barrierDismissible: false,
-                builder: (_) => const Center(child: CircularProgressIndicator()),
+                builder: (_) =>
+                    const Center(child: CircularProgressIndicator()),
               ).then((_) {
                 _isDialogVisible = false;
               });
@@ -72,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const Navbar()),
-                    (route) => false,
+                (route) => false,
               );
             }
           },
@@ -114,9 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                               keyboardType: TextInputType.emailAddress,
                               validator: FormValidator.validateEmail,
                               controller: _emailController,
-                              style: TextStyle(
-                                color: appTheme.textLD,
-                              ),
+                              style: TextStyle(color: appTheme.textLD),
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -128,9 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 prefixIconColor: appTheme.textLD,
                                 hintText: 'Email',
-                                hintStyle: TextStyle(
-                                  color: appTheme.textLD,
-                                ),
+                                hintStyle: TextStyle(color: appTheme.textLD),
                                 filled: true,
                                 fillColor: appTheme.cardBackground,
                               ),
@@ -147,9 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                             child: TextFormField(
                               validator: FormValidator.validatePassword,
                               controller: _passwordController,
-                              style: TextStyle(
-                                color: appTheme.textLD,
-                              ),
+                              style: TextStyle(color: appTheme.textLD),
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -161,13 +160,26 @@ class _LoginPageState extends State<LoginPage> {
                                   color: appTheme.textLD,
                                 ),
                                 prefixIconColor: appTheme.textLD,
-                                hintStyle: TextStyle(
-                                  color: appTheme.textLD,
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _isPasswordVisible = !_isPasswordVisible;
+                                    });
+                                  },
+                                  icon: _isPasswordVisible? Icon(
+                                    Icons.visibility_rounded,
+                                    color: appTheme.textLD,
+                                  ) : Icon(
+                                    Icons.visibility_off_rounded,
+                                    color: appTheme.textLD,
+                                  ),
                                 ),
+                                suffixIconColor: appTheme.textLD,
+                                hintStyle: TextStyle(color: appTheme.textLD),
                                 filled: true,
                                 fillColor: appTheme.cardBackground,
                               ),
-                              obscureText: true,
+                              obscureText: !_isPasswordVisible,
                             ),
                           ),
                         ],
@@ -186,12 +198,15 @@ class _LoginPageState extends State<LoginPage> {
                                     _emailController.text,
                                     _passwordController.text,
                                   );
-                                }
-                                else{
-                                  BlocProvider.of<AuthCubit>(context).clearErrors();
+                                } else {
+                                  BlocProvider.of<AuthCubit>(
+                                    context,
+                                  ).clearErrors();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text("Invalid email or password"),
+                                      content: Text(
+                                        "Invalid email or password",
+                                      ),
                                       backgroundColor: Colors.red,
                                       behavior: SnackBarBehavior.floating,
                                       shape: RoundedRectangleBorder(
@@ -262,7 +277,9 @@ class _LoginPageState extends State<LoginPage> {
                             height: 50,
                             child: ElevatedButton(
                               onPressed: () {
-                                BlocProvider.of<AuthCubit>(context).signInWithGoogle();
+                                BlocProvider.of<AuthCubit>(
+                                  context,
+                                ).signInWithGoogle();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: appTheme.cardBackground,

@@ -22,7 +22,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
+  bool isPasswordVisible = false;
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -81,18 +81,14 @@ class _SignUpPageState extends State<SignUpPage> {
                             child: TextFormField(
                               validator: FormValidator.validateName,
                               controller: _firstNameController,
-                              style: TextStyle(
-                                color: appTheme.textLD,
-                              ),
+                              style: TextStyle(color: appTheme.textLD),
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide.none,
                                 ),
                                 hintText: 'First Name',
-                                hintStyle: TextStyle(
-                                  color: appTheme.textLD,
-                                ),
+                                hintStyle: TextStyle(color: appTheme.textLD),
                                 prefixIcon: Icon(
                                   Icons.person,
                                   color: appTheme.textLD,
@@ -113,9 +109,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             child: TextFormField(
                               validator: FormValidator.validateName,
                               controller: _lastNameController,
-                              style: TextStyle(
-                                color: appTheme.textLD,
-                              ),
+                              style: TextStyle(color: appTheme.textLD),
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -126,9 +120,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   Icons.person,
                                   color: appTheme.textLD,
                                 ),
-                                hintStyle: TextStyle(
-                                  color: appTheme.textLD,
-                                ),
+                                hintStyle: TextStyle(color: appTheme.textLD),
                                 filled: true,
                                 fillColor: appTheme.cardBackground,
                               ),
@@ -145,9 +137,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             child: TextFormField(
                               validator: FormValidator.validateEmail,
                               controller: _emailController,
-                              style: TextStyle(
-                                color: appTheme.textLD,
-                              ),
+                              style: TextStyle(color: appTheme.textLD),
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -158,9 +148,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   Icons.email,
                                   color: appTheme.textLD,
                                 ),
-                                hintStyle: TextStyle(
-                                  color: appTheme.textLD,
-                                ),
+                                hintStyle: TextStyle(color: appTheme.textLD),
                                 filled: true,
                                 fillColor: appTheme.cardBackground,
                               ),
@@ -177,9 +165,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             child: TextFormField(
                               validator: FormValidator.validatePassword,
                               controller: _passwordController,
-                              style: TextStyle(
-                                color: appTheme.textLD,
-                              ),
+                              style: TextStyle(color: appTheme.textLD),
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -190,13 +176,27 @@ class _SignUpPageState extends State<SignUpPage> {
                                   Icons.lock,
                                   color: appTheme.textLD,
                                 ),
-                                hintStyle: TextStyle(
-                                  color: appTheme.textLD,
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isPasswordVisible = !isPasswordVisible;
+                                    });
+                                  },
+                                  icon: isPasswordVisible
+                                      ? Icon(
+                                          Icons.visibility,
+                                          color: appTheme.textLD,
+                                        )
+                                      : Icon(
+                                          Icons.visibility_off,
+                                          color: appTheme.textLD,
+                                        ),
                                 ),
+                                hintStyle: TextStyle(color: appTheme.textLD),
                                 filled: true,
                                 fillColor: appTheme.cardBackground,
                               ),
-                              obscureText: true,
+                              obscureText: !isPasswordVisible,
                             ),
                           ),
                         ],
@@ -302,9 +302,7 @@ class _SignUpPageState extends State<SignUpPage> {
             } else if (state is AuthError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
-                    state.message,
-                  ),
+                  content: Text(state.message),
                   backgroundColor: Colors.red,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
