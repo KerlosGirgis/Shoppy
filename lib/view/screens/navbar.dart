@@ -16,20 +16,24 @@ class Navbar extends StatefulWidget {
   State<Navbar> createState() => _NavbarState();
 }
 
-final _pageController = PageController(
-  initialPage: 0,
-);
-
-final NotchBottomBarController _controller = NotchBottomBarController(
-  index: 0
-);
-
-@override
-void dispose() {
-  _pageController.dispose();
-}
 
 class _NavbarState extends State<Navbar> {
+
+  late final PageController _pageController;
+  late final NotchBottomBarController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+    _controller = NotchBottomBarController(index: 0);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

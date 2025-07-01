@@ -19,7 +19,11 @@ class FavService {
 
   Future<List<String>> getFavs() async {
     DocumentSnapshot snapshot = await _firestore.collection('users').doc(_auth.currentUser?.uid).get();
-    return List<String>.from(snapshot.get('favs') ?? []);
+    try{
+      return List<String>.from(snapshot['favs']);
+    }catch(e){
+      return [];
+    }
   }
 
   Future<bool> isFav(String fav) async {
