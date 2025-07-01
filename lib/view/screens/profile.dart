@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shoppy/theme/theme.dart';
 import 'package:shoppy/view/screens/login.dart';
+import 'package:shoppy/view/screens/orders.dart';
 import 'package:shoppy/view_model/theme_cubit.dart';
 
 import '../../view_model/auth/auth_cubit.dart';
@@ -95,8 +96,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: Padding(
                                 padding: EdgeInsets.only(right: 16, left: 16),
                                 child: ElevatedButton(
-
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => OrdersPage()));
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(13),

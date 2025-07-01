@@ -23,11 +23,13 @@ class _CartPageState extends State<CartPage> {
 
   Future<void> initialize() async {
     BlocProvider.of<ProductCubit>(context).getList(
-        await BlocProvider.of<CartCubit>(context).getCart().then((value){
-      return value.map((item) => item["id"]?.toString())
-          .whereType<String>()
-          .toList();
-    }));
+      await BlocProvider.of<CartCubit>(context).getCart().then((value) {
+        return value
+            .map((item) => item["id"]?.toString())
+            .whereType<String>()
+            .toList();
+      }),
+    );
   }
 
   @override
@@ -38,6 +40,7 @@ class _CartPageState extends State<CartPage> {
           child: Scaffold(
             backgroundColor: appTheme.backgroundColor,
             appBar: AppBar(
+              surfaceTintColor: appTheme.backgroundColor,
               title: Text(
                 'Cart',
                 style: TextStyle(
@@ -47,6 +50,66 @@ class _CartPageState extends State<CartPage> {
                 ),
               ),
               backgroundColor: appTheme.backgroundColor,
+              actions: [
+                BlocBuilder<CartCubit, CartState>(
+                  builder: (context, state) {
+                    if (state is CartSuccess) {
+                      return BlocBuilder<ProductCubit, ProductState>(
+                        builder: (context, productState) {
+                          if (productState is ProductLoaded) {
+                            double totalPrice = 0.0;
+                            for (var item in state.items) {
+                              final productId = item["id"];
+                              final quantity = item["quantity"];
+                              final product = productState.products.firstWhere(
+                                (p) => p.id == productId,
+                              );
+                              totalPrice += product.price * quantity;
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 16.0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "\$${totalPrice.toString()}",
+                                    style: TextStyle(
+                                      color: appTheme.textLD,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: Text(
+                              '\$0.0',
+                              style: TextStyle(
+                                color: appTheme.textLD,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Text(
+                        '\$0.0',
+                        style: TextStyle(
+                          color: appTheme.textLD,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
             body: BlocBuilder<CartCubit, CartState>(
               builder: (context, cartState) {
@@ -63,152 +126,196 @@ class _CartPageState extends State<CartPage> {
                     builder: (context, state) {
                       if (state is ProductLoading) {
                         return const Center(child: CircularProgressIndicator());
-                      } if (state is ProductError) {
+                      }
+                      if (state is ProductError) {
                         return Center(child: Text('Error: ${state.message}'));
                       }
-                      if (state is ProductEmpty){
-                        return Center(child: Image.asset("assets/pics/empty_cart.png"));
+                      if (state is ProductEmpty) {
+                        return Center(
+                          child: Image.asset("assets/pics/empty_cart.png"),
+                        );
                       }
                       if (state is ProductLoaded) {
-                        return ListView.builder(
-                          itemCount: cartState.items.length,
-                          itemBuilder: (context, index) {
-                            final cartItem = cartState.items[index];
-                            final productId = cartItem["id"];
-                            final quantity = cartItem["quantity"];
-                            final product = state.products.firstWhere(
-                                  (p) => p.id == productId,
-                            );
-                            return Card(
-                              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              color: appTheme.cardBackground,
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(13),
-                                      child: Image.network(
-                                        product.imageCover,
-                                        width: 100,
-                                        height: 100,
-                                        fit: BoxFit.cover,
-                                      ),
+                        return cartState.items.isNotEmpty
+                            ? ListView.builder(
+                                itemCount: cartState.items.length,
+                                itemBuilder: (context, index) {
+                                  final cartItem = cartState.items[index];
+                                  final productId = cartItem["id"];
+                                  final quantity = cartItem["quantity"];
+                                  final product = state.products.firstWhere(
+                                    (p) => p.id == productId,
+                                  );
+                                  return Card(
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
                                     ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    color: appTheme.cardBackground,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Row(
                                         children: [
-                                          Text(
-                                            product.title,
-                                            style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              color: appTheme.textLD,
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              13,
                                             ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            product.description
-                                                .replaceAll('\t', ' ')
-                                                .replaceAll('\n', ' '),
-                                            maxLines: 1,
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.grey.shade700,
-                                              overflow: TextOverflow.ellipsis,
+                                            child: Image.network(
+                                              product.imageCover,
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                '\$${product.price}',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: appTheme.primaryColor,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              SizedBox(
-                                                width: 32,
-                                                height: 32,
-                                                child: ElevatedButton(
-                                                  onPressed: () {
-                                                    BlocProvider.of<CartCubit>(
-                                                      context,
-                                                    ).removeOneFromCart(product.id);
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
-                                                    backgroundColor: appTheme.primaryColor,
-                                                    shape: const CircleBorder(),
-                                                    padding: const EdgeInsets.all(8),
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.remove,
-                                                    size: 16,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                                child: Text(
-                                                  quantity.toString(),
+                                          const SizedBox(width: 16),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  product.title,
                                                   style: TextStyle(
-                                                    fontSize: 16,
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.bold,
                                                     color: appTheme.textLD,
                                                   ),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                width: 32,
-                                                height: 32,
-                                                child: ElevatedButton(
-                                                  onPressed: () {
-                                                    BlocProvider.of<CartCubit>(
-                                                      context,
-                                                    ).addToCart(product.id, 1);
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
-                                                    backgroundColor: appTheme.primaryColor,
-                                                    shape: const CircleBorder(),
-                                                    padding: const EdgeInsets.all(8),
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.add,
-                                                    size: 16,
-                                                    color: Colors.white,
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  product.description
+                                                      .replaceAll('\t', ' ')
+                                                      .replaceAll('\n', ' '),
+                                                  maxLines: 1,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.grey.shade700,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                                const SizedBox(height: 4),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      '\$${product.price}',
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: appTheme
+                                                            .primaryColor,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    SizedBox(
+                                                      width: 32,
+                                                      height: 32,
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          BlocProvider.of<
+                                                                CartCubit
+                                                              >(context)
+                                                              .removeOneFromCart(
+                                                                product.id,
+                                                              );
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              appTheme
+                                                                  .primaryColor,
+                                                          shape:
+                                                              const CircleBorder(),
+                                                          padding:
+                                                              const EdgeInsets.all(
+                                                                8,
+                                                              ),
+                                                        ),
+                                                        child: const Icon(
+                                                          Icons.remove,
+                                                          size: 16,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 8.0,
+                                                          ),
+                                                      child: Text(
+                                                        quantity.toString(),
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          color:
+                                                              appTheme.textLD,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 32,
+                                                      height: 32,
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          BlocProvider.of<
+                                                                CartCubit
+                                                              >(context)
+                                                              .addToCart(
+                                                                product.id,
+                                                                1,
+                                                              );
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              appTheme
+                                                                  .primaryColor,
+                                                          shape:
+                                                              const CircleBorder(),
+                                                          padding:
+                                                              const EdgeInsets.all(
+                                                                8,
+                                                              ),
+                                                        ),
+                                                        child: const Icon(
+                                                          Icons.add,
+                                                          size: 16,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ],
+                                  );
+                                },
+                              )
+                            : Center(
+                                child: Image.asset(
+                                  "assets/pics/empty_cart.png",
                                 ),
-                              ),
-                            );
-                          },
-                        );
+                              );
                       }
                       return Center(
-                          child: Text(
-                            'No products in the cart.',
-                            style: TextStyle(
-                              color: appTheme.textLD,
-                              fontSize: 18,
-                            ),
+                        child: Text(
+                          'No products in the cart.',
+                          style: TextStyle(
+                            color: appTheme.textLD,
+                            fontSize: 18,
                           ),
-                        );
+                        ),
+                      );
                     },
                   );
                 }
@@ -217,7 +324,7 @@ class _CartPageState extends State<CartPage> {
                     child: Text('Error from cart: ${cartState.error}'),
                   );
                 }
-          
+
                 return Center(
                   child: IconButton(
                     onPressed: () {
@@ -228,22 +335,30 @@ class _CartPageState extends State<CartPage> {
                 );
               },
             ),
-          
-          
-            floatingActionButton: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  FloatingActionButton(
-                      backgroundColor: appTheme.primaryColor,
-                      onPressed: (){},
-                      child: Icon(
-                        Icons.shopping_cart_rounded,
-                        color: Colors.white,
-                      )),
-                  Padding(padding: EdgeInsets.only(bottom: 0))
-                ]
+            floatingActionButton: FloatingActionButton(
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              backgroundColor: appTheme.primaryColor,
+              onPressed: () {
+                BlocProvider.of<CartCubit>(context).checkOut().then((_) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.green,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        content: const Text('Order placed successfully!'),
+                      ),
+                    );
+                  }
+                });
+              },
+              child: Icon(Icons.shopping_cart_rounded, color: Colors.white),
             ),
-          
           ),
         );
       },

@@ -11,6 +11,7 @@ import 'package:shoppy/view_model/auth/auth_state.dart';
 import 'package:shoppy/view_model/cart/cart_cubit.dart';
 import 'package:shoppy/view_model/category/category_cubit.dart';
 import 'package:shoppy/view_model/favourites/fav_cubit.dart';
+import 'package:shoppy/view_model/orders/orders_cubit.dart';
 import 'package:shoppy/view_model/product/product_cubit.dart';
 import 'package:shoppy/view_model/theme_cubit.dart';
 import 'package:shoppy/view_model/user/user_data_cubit.dart';
@@ -29,6 +30,7 @@ Future<void> main() async {
         BlocProvider(create: (context) => ProductCubit()),
         BlocProvider(create: (context) => FavCubit()),
         BlocProvider(create: (context) => CartCubit()),
+        BlocProvider(create: (context) => OrdersCubit()),
         BlocProvider(
           create: (context) => AuthCubit(authService: AuthService()),
         ),

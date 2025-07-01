@@ -268,12 +268,12 @@ class _ProductPageState extends State<ProductPage> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Added to cart"),
-                                  duration: Duration(seconds: 1),
                                   backgroundColor: Colors.green,
                                   behavior: SnackBarBehavior.floating,
-                                  margin: EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 10,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
                                   ),
                                 ),
                               );

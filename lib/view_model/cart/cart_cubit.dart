@@ -8,6 +8,7 @@ class CartCubit extends Cubit<CartState>{
   final CartService _cartService = CartService();
 
 
+
   Future<List<Map<String, dynamic>>> getCart() async {
     emit(CartLoading());
     try {
@@ -66,6 +67,16 @@ class CartCubit extends Cubit<CartState>{
     } catch (e) {
       emit(CartError(error: e.toString()));
     }
+  }
+
+  Future<void> checkOut() async {
+    try {
+      await _cartService.checkOut();
+      emit(CartSuccess(await _cartService.getCart()));
+    } catch (e) {
+      emit(CartError(error: e.toString()));
+    }
+
   }
 
 }

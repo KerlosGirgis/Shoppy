@@ -30,8 +30,9 @@ class CartService {
     final snapshot = await userDoc.get();
 
     if (snapshot.exists) {
-      List<Map<String, dynamic>> cart =
-      List<Map<String, dynamic>>.from(snapshot.data()?['cart'] ?? []);
+      List<Map<String, dynamic>> cart = List<Map<String, dynamic>>.from(
+        snapshot.data()?['cart'] ?? [],
+      );
 
       bool productFound = false;
 
@@ -60,8 +61,9 @@ class CartService {
     final snapshot = await userDoc.get();
 
     if (snapshot.exists) {
-      List<Map<String, dynamic>> cart =
-      List<Map<String, dynamic>>.from(snapshot.data()?['cart'] ?? []);
+      List<Map<String, dynamic>> cart = List<Map<String, dynamic>>.from(
+        snapshot.data()?['cart'] ?? [],
+      );
 
       cart.removeWhere((item) => item['id'] == productId);
 
@@ -78,8 +80,9 @@ class CartService {
     final snapshot = await userDoc.get();
 
     if (snapshot.exists) {
-      List<Map<String, dynamic>> cart =
-      List<Map<String, dynamic>>.from(snapshot.data()?['cart'] ?? []);
+      List<Map<String, dynamic>> cart = List<Map<String, dynamic>>.from(
+        snapshot.data()?['cart'] ?? [],
+      );
 
       bool updated = false;
 
@@ -106,8 +109,21 @@ class CartService {
     final user = _auth.currentUser;
     if (user == null) return;
 
+    await _firestore.collection('users').doc(user.uid).update({'cart': []});
+  }
+
+  Future<void> checkOut() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
     await _firestore.collection('users').doc(user.uid).update({
+      'orders': FieldValue.arrayUnion([
+        {
+          'items': await getCart(),
+          'timestamp': DateTime.now(),
+        }
+      ]),
       'cart': [],
     });
+    await _firestore.collection('users').doc(user.uid).update({'cart': []});
   }
 }
