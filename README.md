@@ -21,6 +21,8 @@ Shoppy is a Flutter-based e-commerce app that uses Firebase for authentication a
 Here’s a glimpse of the Shoppy experience:
 
 <img width="175" alt="1.png" src="screenshots%2F1.png"/><img width="175" alt="2.png" src="screenshots%2F2.png"/><img width="175" alt="3.png" src="screenshots%2F3.png"/><img width="175" alt="4.png" src="screenshots%2F4.png"/><img width="175" alt="5.png" src="screenshots%2F5.png"/><img width="175" alt="6.png" src="screenshots%2F6.png"/>
+<img width="175" alt="1.png" src="screenshots%2F7.png"/><img width="175" alt="2.png" src="screenshots%2F8.png"/><img width="175" alt="3.png" src="screenshots%2F9.png"/><img width="175" alt="4.png" src="screenshots%2F10.png"/><img width="175" alt="5.png" src="screenshots%2F11.png"/><img width="175" alt="6.png" src="screenshots%2F12.png"/>
+
 
 ---
 
